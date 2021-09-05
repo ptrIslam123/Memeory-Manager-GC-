@@ -51,10 +51,19 @@ size_t MemBuffer::getCountBlocks() const {
     return countBlocks_;
 }
 
+MemBuffer::~MemBuffer() {
+    delete(begin_);
+
+    begin_ = nullptr;
+    curFreeSpace_ = nullptr;
+    sizeBuff_ = 0;
+    countBlocks_ = 0;
+}
+
 
 MemBlock::MemBlock(const size_t sizeBlock):
-    sizeBlock_(sizeBlock),
-    statusBlock_(freeBlock)
+sizeBlock_(sizeBlock),
+statusBlock_(freeBlock)
 {}
 
 size_t MemBlock::getSizeBlock() const {

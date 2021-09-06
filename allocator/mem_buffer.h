@@ -20,6 +20,7 @@ constexpr bool unfreeBlock = false;
  */
 class MemBuffer {
 public:
+
     /*
      * @brief Инициализирует дефолтными значениями необходимые для работы класса переменные
      */
@@ -42,6 +43,10 @@ public:
     MemBlock* allocMemBlock(const size_t size);
 
     bool unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBlock *const rBlock);
+
+    MemBlock* getPtrOnPrevMemBlock(MemBlock *const memBlock);
+    MemBlock* getPtrOnNextMemBlock(MemBlock *const memBlock);
+    MemBlock* getPtrOnFirstMemBlock();
 
     /*
      * @brief Проверяет, можем ли мы аллоцировать внутри буфера еще один блок памяти
@@ -70,6 +75,7 @@ public:
     size_t getCountBlocks() const;
 
 private:
+    friend MemBlock;
     //! Указатель на начало буфера памяти
     void* begin_;
     //! Указатель на память, находящуюся за последним блоком памяти в буфере
@@ -86,7 +92,7 @@ private:
 
 class MemBlock {
 public:
-    explicit MemBlock(const size_t sizeBlock, MemBlock* prevBlock, MemBlock* nextBlock);
+    explicit MemBlock(const size_t sizeBlock, MemBuffer* buffer, MemBlock* prevBlock, MemBlock* nextBlock);
     ~MemBlock() = default;
 
     void setSizeBlock(const size_t size);
@@ -99,9 +105,13 @@ public:
     MemBlock* getPrevMemBlock() const;
     MemBlock* getNextMemBlock() const;
 
+    bool isLastMemBlock() const;
+    bool isFirstMemBlock() const;
+
 private:
     size_t sizeBlock_;
     bool statusBlock_;
+    MemBuffer* buffer_;
     MemBlock* prevBlock_;
     MemBlock* nextBlock_;
 };

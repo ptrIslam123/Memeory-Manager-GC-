@@ -26,17 +26,17 @@ int main() {
 
     using namespace mem;
 
-    MemBuffer buff(70);
+    MemBuffer buff(200);
     buff.allocateBuffer();
 
     MemBlock* b1 = buff.allocMemBlock(10);
-    MemBlock* b2 = buff.allocMemBlock(25);
-    MemBlock* b3 = buff.allocMemBlock(15);
+    MemBlock* b2 = buff.allocMemBlock(20);
 
-    printBlock(b1);
-    printBlock(b2);
-    printBlock(b3);
-
+    if (b2->isLastMemBlock()) {
+        std::cout << "last blcok\n";
+    } else {
+        std::cout << "don`t last block\n";
+    }
 
     return 0;
 }

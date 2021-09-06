@@ -41,6 +41,8 @@ public:
      */
     MemBlock* allocMemBlock(const size_t size);
 
+    bool unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBlock *const rBlock);
+
     /*
      * @brief Проверяет, можем ли мы аллоцировать внутри буфера еще один блок памяти
      * @param размер памяти нужной нам
@@ -72,6 +74,8 @@ private:
     void* begin_;
     //! Указатель на память, находящуюся за последним блоком памяти в буфере
     void* curFreeSpace_;
+    //!
+    MemBlock* curMemBlock_;
     //! Размер буфера памяти
     size_t sizeBuff_;
     //! Количество созданных в буфере блоков памяти
@@ -82,15 +86,24 @@ private:
 
 class MemBlock {
 public:
-    MemBlock(const size_t sizeBlock);
+    explicit MemBlock(const size_t sizeBlock, MemBlock* prevBlock, MemBlock* nextBlock);
     ~MemBlock() = default;
+
+    void setSizeBlock(const size_t size);
+    void setStatusBlock(const bool status);
+    void setPrevMemBlock(MemBlock *const memBlock);
+    void setNextMemBlock(MemBlock *const memBlock);
 
     size_t getSizeBlock() const;
     bool getStatusBlock() const;
+    MemBlock* getPrevMemBlock() const;
+    MemBlock* getNextMemBlock() const;
 
 private:
     size_t sizeBlock_;
     bool statusBlock_;
+    MemBlock* prevBlock_;
+    MemBlock* nextBlock_;
 };
 
 }

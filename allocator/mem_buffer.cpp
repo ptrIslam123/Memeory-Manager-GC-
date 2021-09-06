@@ -10,7 +10,7 @@ MemBuffer::MemBuffer(const size_t sizeBuff):
 {}
 
 void MemBuffer::allocateBuffer() {
-    begin_ = operator new(sizeBuff_);
+    begin_ = malloc(sizeBuff_);
     curFreeSpace_ = begin_;
 }
 
@@ -21,18 +21,22 @@ MemBlock* MemBuffer::allocMemBlock(const size_t size) {
         return nullptr;
     }
 
-    MemBlock* memBlock = nullptr;
+    MemBlock* newMemBlock = nullptr;
+
     if (curFreeSpace_ == begin_) {
-        memBlock = static_cast<MemBlock*>(begin_);
+        newMemBlock = static_cast<MemBlock*>(begin_);
         curFreeSpace_ = (char*)curFreeSpace_ + totalSize;
+        new (newMemBlock) MemBlock(size, nullptr, static_cast<MemBlock*>(curFreeSpace_));
+        curMemBlock_ = newMemBlock;
     }else {
-        memBlock = static_cast<MemBlock*>(curFreeSpace_);
+        newMemBlock = static_cast<MemBlock*>(curFreeSpace_);
         curFreeSpace_ = (char*)curFreeSpace_ + totalSize;
+        new (newMemBlock) MemBlock(size, curMemBlock_, static_cast<MemBlock*>(curFreeSpace_));
+        curMemBlock_ = newMemBlock;
     }
 
-    new (memBlock) MemBlock(size);
     sizeBuff_ -= totalSize;
-    return memBlock;
+    return newMemBlock;
 }
 
 bool MemBuffer::isBufferOver(const size_t size) const {
@@ -52,7 +56,7 @@ size_t MemBuffer::getCountBlocks() const {
 }
 
 MemBuffer::~MemBuffer() {
-    delete(begin_);
+    free(begin_);
 
     begin_ = nullptr;
     curFreeSpace_ = nullptr;
@@ -60,10 +64,17 @@ MemBuffer::~MemBuffer() {
     countBlocks_ = 0;
 }
 
+bool MemBuffer::unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBlock *const rBlock) {
 
-MemBlock::MemBlock(const size_t sizeBlock):
+    return true;
+}
+
+
+MemBlock::MemBlock(const size_t sizeBlock, MemBlock* prevBlock, MemBlock* nextBlock):
 sizeBlock_(sizeBlock),
-statusBlock_(freeBlock)
+statusBlock_(unfreeBlock),
+prevBlock_(prevBlock),
+nextBlock_(nextBlock)
 {}
 
 size_t MemBlock::getSizeBlock() const {
@@ -72,6 +83,30 @@ size_t MemBlock::getSizeBlock() const {
 
 bool MemBlock::getStatusBlock() const {
     return statusBlock_;
+}
+
+void MemBlock::setSizeBlock(const size_t size) {
+    sizeBlock_ = size;
+}
+
+void MemBlock::setStatusBlock(const bool status) {
+    statusBlock_ = status;
+}
+
+void MemBlock::setPrevMemBlock(MemBlock *const memBlock) {
+    prevBlock_ = memBlock;
+}
+
+void MemBlock::setNextMemBlock(MemBlock *const memBlock) {
+    nextBlock_ = memBlock;
+}
+
+MemBlock *MemBlock::getPrevMemBlock() const {
+    return prevBlock_;
+}
+
+MemBlock *MemBlock::getNextMemBlock() const {
+    return nextBlock_;
 }
 
 }

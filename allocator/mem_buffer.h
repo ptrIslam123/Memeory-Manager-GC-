@@ -42,11 +42,12 @@ public:
      */
     MemBlock* allocMemBlock(const size_t size);
 
-    bool unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBlock *const rBlock);
+    size_t unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBlock *const rBlock);
 
-    MemBlock* getPtrOnPrevMemBlock(MemBlock *const memBlock);
-    MemBlock* getPtrOnNextMemBlock(MemBlock *const memBlock);
-    MemBlock* getPtrOnFirstMemBlock();
+    MemBlock* getPrevMemBlock(MemBlock *const memBlock);
+    MemBlock* getNextMemBlock(MemBlock *const memBlock);
+    MemBlock* getFirstMemBlock();
+    MemBlock* getLastMemBlock();
 
     /*
      * @brief Проверяет, можем ли мы аллоцировать внутри буфера еще один блок памяти
@@ -80,8 +81,8 @@ private:
     void* begin_;
     //! Указатель на память, находящуюся за последним блоком памяти в буфере
     void* curFreeSpace_;
-    //!
-    MemBlock* curMemBlock_;
+    //! Указатель на последний валидный блок памяти в буфере
+    MemBlock* lastMemBlock_;
     //! Размер буфера памяти
     size_t sizeBuff_;
     //! Количество созданных в буфере блоков памяти

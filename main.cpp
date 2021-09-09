@@ -1,42 +1,42 @@
 #include <iostream>
 #include "allocator/mem_buffer.h"
-#include "test/tests.h"
+#include "test/mem_buffer_test.h"
 
-void printBlock(const mem::MemBlock* block, const std::string blockType = "block") {
-    if (block == nullptr) {
-        return;
-    }
 
-    if (blockType == "block") {
-        std::cout << "{\n";
-        std::cout << "block.size : " << block->getSizeBlock() << "\n"
-                  << "block.status : " << block->getStatusBlock() << "\n";
-        printBlock(block->getPrevMemBlock(), "prevBlock");
-        printBlock(block->getNextMemBlock(), "nextBlock");
-
-        std::cout << "\n}\n";
-    } else {
-        std::cout << "\t" << blockType << ".size : " << block->getSizeBlock() << "\n"
-                  << "\t" << blockType <<  ".status : " << block->getStatusBlock() << "\n";
-    }
-}
 
 
 int main() {
 
     using namespace mem;
 
-    MemBuffer buff(200);
-    buff.allocateBuffer();
+    MemBuffer buf(300);
+    buf.allocateBuffer();
 
-    MemBlock* b1 = buff.allocMemBlock(10);
-    MemBlock* b2 = buff.allocMemBlock(20);
+    MemBlock* b1 = buf.allocMemBlock(10);
+    MemBlock* b2 = buf.allocMemBlock(20);
+    MemBlock* b3 = buf.allocMemBlock(15);
 
-    if (b2->isLastMemBlock()) {
-        std::cout << "last blcok\n";
-    } else {
-        std::cout << "don`t last block\n";
+    b1->setStatusBlock(true);
+    b2->setStatusBlock(true);
+
+    const size_t b1Size = b1->getSizeBlock();
+    const size_t b2Size = b2->getSizeBlock();
+
+    if (buf.unitTwoFreeMemBlockInOneMemBlock(b1, b2) == 0) {
+        std::cout << "erorr\n";
+        return -1;
     }
+    std::cout << "newB1Size : " << b1->getSizeBlock() << "\n";
+
+
+    MemBlock* it = buf.getFirstMemBlock();
+    while (!it->isLastMemBlock()) {
+        printBlock(it);
+        it = it->getNextMemBlock();
+    }
+
+    printBlock(it);
+
 
     return 0;
 }

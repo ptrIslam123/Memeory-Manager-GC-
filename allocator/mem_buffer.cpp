@@ -27,15 +27,16 @@ MemBlock* MemBuffer::allocMemBlock(const size_t size) {
         newMemBlock = static_cast<MemBlock*>(begin_);
         curFreeSpace_ = (char*)curFreeSpace_ + totalSize;
         new (newMemBlock) MemBlock(size, this, nullptr, static_cast<MemBlock*>(curFreeSpace_));
-        curMemBlock_ = newMemBlock;
+        lastMemBlock_ = newMemBlock;
     }else {
         newMemBlock = static_cast<MemBlock*>(curFreeSpace_);
         curFreeSpace_ = (char*)curFreeSpace_ + totalSize;
-        new (newMemBlock) MemBlock(size, this, curMemBlock_, static_cast<MemBlock*>(curFreeSpace_));
-        curMemBlock_ = newMemBlock;
+        new (newMemBlock) MemBlock(size, this, lastMemBlock_, static_cast<MemBlock*>(curFreeSpace_));
+        lastMemBlock_ = newMemBlock;
     }
 
     sizeBuff_ -= totalSize;
+    countBlocks_++;
     return newMemBlock;
 }
 
@@ -64,20 +65,33 @@ MemBuffer::~MemBuffer() {
     countBlocks_ = 0;
 }
 
-bool MemBuffer::unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBlock *const rBlock) {
-    return true;
+size_t MemBuffer::unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBlock *const rBlock) {
+    if (lBlock->getStatusBlock() == unfreeBlock || rBlock->getStatusBlock() == unfreeBlock) {
+        return 0;
+    }
+    const size_t sizeUnitMemBlock = lBlock->getSizeBlock() + rBlock->getSizeBlock();
+    lBlock->setSizeBlock(sizeUnitMemBlock);
+    lBlock->setNextMemBlock(rBlock->getNextMemBlock());
+    MemBlock* nextBlock = rBlock->getNextMemBlock();
+    nextBlock->setPrevMemBlock(lBlock);
+    countBlocks_--;
+    return sizeUnitMemBlock;
 }
 
-MemBlock *MemBuffer::getPtrOnPrevMemBlock(MemBlock *const memBlock) {
+MemBlock *MemBuffer::getPrevMemBlock(MemBlock *const memBlock) {
     return memBlock->getPrevMemBlock();
 }
 
-MemBlock *MemBuffer::getPtrOnNextMemBlock(MemBlock *const memBlock) {
+MemBlock *MemBuffer::getNextMemBlock(MemBlock *const memBlock) {
     return memBlock->getNextMemBlock();
 }
 
-MemBlock *MemBuffer::getPtrOnFirstMemBlock() {
+MemBlock *MemBuffer::getFirstMemBlock() {
     return static_cast<MemBlock*>(begin_);
+}
+
+MemBlock* MemBuffer::getLastMemBlock() {
+    return lastMemBlock_;
 }
 
 
@@ -122,7 +136,7 @@ MemBlock *MemBlock::getNextMemBlock() const {
 }
 
 bool MemBlock::isLastMemBlock() const {
-    return this == (buffer_->curFreeSpace_);
+    return (this == buffer_->lastMemBlock_);
 }
 
 bool MemBlock::isFirstMemBlock() const {

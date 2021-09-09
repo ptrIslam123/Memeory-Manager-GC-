@@ -8,4 +8,4 @@ add_executable(allocator
 
         allocator/mem_buffer.cpp
 
-        test/tests.cpp)
+        test/mem_buffer_test.cpp)

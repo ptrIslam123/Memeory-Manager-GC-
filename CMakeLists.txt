@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(allocator
         main.cpp
-
         allocator/mem_buffer.cpp
-
-        test/mem_buffer_test.cpp)
+        allocator/mem_block.cpp
+        test/mem_buffer_test.cpp allocator/mem_block.h)

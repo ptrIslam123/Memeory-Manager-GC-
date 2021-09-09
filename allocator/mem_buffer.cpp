@@ -1,5 +1,7 @@
 #include "mem_buffer.h"
 
+#include "mem_block.h"
+
 namespace mem {
 
 MemBuffer::MemBuffer(const size_t sizeBuff):
@@ -40,6 +42,19 @@ MemBlock* MemBuffer::allocMemBlock(const size_t size) {
     return newMemBlock;
 }
 
+bool MemBuffer::deallocateMemBlock(MemBlock *memBlock) {
+    if (memBlock->getStatusBlock() == freeBlock) {
+        return false;
+    }
+
+    memBlock->setStatusBlock(freeBlock);
+    if (!memBlock->isFirstMemBlock()) {
+        unitTwoFreeMemBlockInOneMemBlock(memBlock->getPrevMemBlock(), memBlock);
+    } else if (!memBlock->isLastMemBlock()) {
+        unitTwoFreeMemBlockInOneMemBlock(memBlock, memBlock->getNextMemBlock());
+    }
+}
+
 bool MemBuffer::isBufferOver(const size_t size) const {
     return (size > sizeBuff_);
 }
@@ -48,7 +63,7 @@ void *MemBuffer::getBuffer() const {
     return begin_;
 }
 
-size_t MemBuffer::getSizeBuffer() const {
+size_t MemBuffer::getSizeFreeSpace() const {
     return sizeBuff_;
 }
 
@@ -69,6 +84,14 @@ size_t MemBuffer::unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBl
     if (lBlock->getStatusBlock() == unfreeBlock || rBlock->getStatusBlock() == unfreeBlock) {
         return 0;
     }
+
+    if (rBlock->isLastMemBlock()) {
+        lastMemBlock_ = lBlock;
+    }
+    return unitTwoBlockInOne(lBlock, rBlock);
+}
+
+size_t MemBuffer::unitTwoBlockInOne(MemBlock *const lBlock, MemBlock *const rBlock) {
     const size_t sizeUnitMemBlock = lBlock->getSizeBlock() + rBlock->getSizeBlock();
     lBlock->setSizeBlock(sizeUnitMemBlock);
     lBlock->setNextMemBlock(rBlock->getNextMemBlock());
@@ -94,57 +117,4 @@ MemBlock* MemBuffer::getLastMemBlock() {
     return lastMemBlock_;
 }
 
-
-    MemBlock::MemBlock(const size_t sizeBlock, MemBuffer* buffer, MemBlock* prevBlock, MemBlock* nextBlock):
-sizeBlock_(sizeBlock),
-statusBlock_(unfreeBlock),
-buffer_(buffer),
-prevBlock_(prevBlock),
-nextBlock_(nextBlock)
-{}
-
-size_t MemBlock::getSizeBlock() const {
-    return sizeBlock_;
-}
-
-bool MemBlock::getStatusBlock() const {
-    return statusBlock_;
-}
-
-void MemBlock::setSizeBlock(const size_t size) {
-    sizeBlock_ = size;
-}
-
-void MemBlock::setStatusBlock(const bool status) {
-    statusBlock_ = status;
-}
-
-void MemBlock::setPrevMemBlock(MemBlock *const memBlock) {
-    prevBlock_ = memBlock;
-}
-
-void MemBlock::setNextMemBlock(MemBlock *const memBlock) {
-    nextBlock_ = memBlock;
-}
-
-MemBlock *MemBlock::getPrevMemBlock() const {
-    return prevBlock_;
-}
-
-MemBlock *MemBlock::getNextMemBlock() const {
-    return nextBlock_;
-}
-
-bool MemBlock::isLastMemBlock() const {
-    return (this == buffer_->lastMemBlock_);
-}
-
-bool MemBlock::isFirstMemBlock() const {
-    return (char*)this == (char*)(buffer_->begin_);
-}
-
-}
-
-
-
-
+} //namespace mem

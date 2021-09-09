@@ -5,7 +5,9 @@
 #include <stdlib.h>
 
 #include "../allocator/mem_buffer.h"
+#include "../allocator/mem_block.h"
 
+void deallocateMemBlockTest();
 void allocMemBlockTest(size_t sizeBuff, size_t sizeMemBlock);
 void iterationByMemBufferTest(size_t sizeBuff);
 void printBlock(const mem::MemBlock* block, const std::string blockType = "block");

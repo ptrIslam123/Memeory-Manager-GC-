@@ -6,13 +6,8 @@
 
 namespace mem {
 
-class MemBuffer;
+//! Объявление класса блока памяти
 class MemBlock;
-
-//! Значение означающее, что блок памяти не занят
-constexpr bool freeBlock = true;
-//! Значение означающее, что блок памяти занят
-constexpr bool unfreeBlock = false;
 
 /*
  * @brief Класс Буфер.
@@ -31,7 +26,7 @@ public:
     ~MemBuffer();
 
     /*
-     * @brief Выделает в heap`е буфер памяти, размера переданного через конструктор
+     * @brief Выделает буфер памяти, размера переданного через конструктор
      */
     void allocateBuffer();
 
@@ -42,11 +37,61 @@ public:
      */
     MemBlock* allocMemBlock(const size_t size);
 
+    /*
+     * @brief Деаллоцирует в буфере переданный блок памяти
+     *
+     * @param memBlock Указатель на блок памяти, который нужно освободить
+     * @return true в случае если блок памяти деаллоцировали
+     * @return false иначе
+     */
+    bool deallocateMemBlock(MemBlock *memBlock);
+
+    /*
+     * @brief Объединяет два свободных блока в один блок суммарного размера
+     *
+     * @param lBlock Указатель на левый блок памяти
+     * @param rBlock Указатель на правый блок памяти
+     * @return размер объединенного блока памяти в случае успеха
+     * @return 0, если хотя бы один из блоков памяти оказался занятым
+     */
     size_t unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBlock *const rBlock);
 
+    /*
+     * @brief Объединяет два блока памяти не проверяя, свободны ли эти два блока
+     *
+     * @param lBlock Указатель на левый блок памяти
+     * @param rBlock Указатель на правый блок памяти
+     * @return размер объединенного блока памяти в случае успеха
+     * @return 0, если хотя бы один из блоков памяти оказался занятым
+     */
+    size_t unitTwoBlockInOne(MemBlock *const lBlock, MemBlock *const rBlock);
+
+    /*
+     * @brief Получить указатель на предыдущий блок памяти
+     *
+     * @return Указатель на предыдущий блок памяти
+     */
     MemBlock* getPrevMemBlock(MemBlock *const memBlock);
+
+    /*
+    * @brief Получить указатель на следующий блок памяти
+    *
+    * @return Указатель на следующий блок памяти
+    */
     MemBlock* getNextMemBlock(MemBlock *const memBlock);
+
+    /*
+    * @brief Получить указатель на первый блок памяти
+    *
+    * @return Указатель на первый блок памяти
+    */
     MemBlock* getFirstMemBlock();
+
+    /*
+    * @brief Получить указатель на последний блок памяти
+    *
+    * @return Указатель на последний блок памяти
+    */
     MemBlock* getLastMemBlock();
 
     /*
@@ -67,7 +112,7 @@ public:
      * @brief возвращает размер буфера памяти
      * @return размер буфера
      */
-    size_t getSizeBuffer() const;
+    size_t getSizeFreeSpace() const;
 
     /*
      * @brief возвращает количество блоков памяти уже аллоцированных в буфере
@@ -78,45 +123,17 @@ public:
 private:
     friend MemBlock;
     //! Указатель на начало буфера памяти
-    void* begin_;
+    void *begin_;
     //! Указатель на память, находящуюся за последним блоком памяти в буфере
-    void* curFreeSpace_;
+    void *curFreeSpace_;
     //! Указатель на последний валидный блок памяти в буфере
-    MemBlock* lastMemBlock_;
+    MemBlock *lastMemBlock_;
     //! Размер буфера памяти
     size_t sizeBuff_;
     //! Количество созданных в буфере блоков памяти
     size_t countBlocks_;
 };
 
-
-
-class MemBlock {
-public:
-    explicit MemBlock(const size_t sizeBlock, MemBuffer* buffer, MemBlock* prevBlock, MemBlock* nextBlock);
-    ~MemBlock() = default;
-
-    void setSizeBlock(const size_t size);
-    void setStatusBlock(const bool status);
-    void setPrevMemBlock(MemBlock *const memBlock);
-    void setNextMemBlock(MemBlock *const memBlock);
-
-    size_t getSizeBlock() const;
-    bool getStatusBlock() const;
-    MemBlock* getPrevMemBlock() const;
-    MemBlock* getNextMemBlock() const;
-
-    bool isLastMemBlock() const;
-    bool isFirstMemBlock() const;
-
-private:
-    size_t sizeBlock_;
-    bool statusBlock_;
-    MemBuffer* buffer_;
-    MemBlock* prevBlock_;
-    MemBlock* nextBlock_;
-};
-
-}
+} //namespace mem
 
 #endif //UNTITLED1_MEM_BUFFER_H

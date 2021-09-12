@@ -49,9 +49,11 @@ bool MemBuffer::deallocateMemBlock(MemBlock *memBlock) {
 
     memBlock->setStatusBlock(freeBlock);
     if (!memBlock->isFirstMemBlock()) {
-        unitTwoFreeMemBlockInOneMemBlock(memBlock->getPrevMemBlock(), memBlock);
+        return unitTwoFreeMemBlockInOneMemBlock(memBlock->getPrevMemBlock(), memBlock);
     } else if (!memBlock->isLastMemBlock()) {
-        unitTwoFreeMemBlockInOneMemBlock(memBlock, memBlock->getNextMemBlock());
+        return unitTwoFreeMemBlockInOneMemBlock(memBlock, memBlock->getNextMemBlock());
+    } else {
+        return false;
     }
 }
 
@@ -115,6 +117,19 @@ MemBlock *MemBuffer::getFirstMemBlock() {
 
 MemBlock* MemBuffer::getLastMemBlock() {
     return lastMemBlock_;
+}
+
+
+MemBuffer &getMemBufferInstance() {
+    static constexpr size_t sizeBuffer = 1024;
+    static mem::MemBuffer buffer(sizeBuffer);
+    static bool isInitBuffer = false;
+
+    if (!isInitBuffer) {
+        buffer.allocateBuffer();
+        isInitBuffer = true;
+    }
+    return buffer;
 }
 
 } //namespace mem

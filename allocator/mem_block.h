@@ -2,6 +2,8 @@
 #define ALLOCATOR_MEM_BLOCK_H
 
 #include <stdlib.h>
+#include "mem_buffer.h"
+
 
 namespace mem {
 
@@ -10,6 +12,7 @@ constexpr bool freeBlock = true;
 //! Значение означающее, что блок памяти занят
 constexpr bool unfreeBlock = false;
 //! Объявление класса буфера
+
 class MemBuffer;
 
 class MemBlock {
@@ -38,8 +41,8 @@ private:
     MemBlock* nextBlock_;
 };
 
+MemBuffer &getMemBufferInstance();
+
 } // namespace mem
-
-
 
 #endif //ALLOCATOR_MEM_BLOCK_H

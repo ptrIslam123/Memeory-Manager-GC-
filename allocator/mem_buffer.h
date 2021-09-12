@@ -134,6 +134,9 @@ private:
     size_t countBlocks_;
 };
 
+
+MemBuffer& getMemBuffer();
+
 } //namespace mem
 
 #endif //UNTITLED1_MEM_BUFFER_H

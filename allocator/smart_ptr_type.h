@@ -5,17 +5,17 @@
 
 namespace mem {
 
-    template<typename T>
-    struct SafeSmartPtr {
-        static void checkPoint(T *ptr) {
-            assert(ptr != nullptr);
-        }
-    };
+template<typename T>
+struct SafeSmartPtr {
+    static void checkPoint(T *ptr) {
+        assert(ptr != nullptr);
+    }
+};
 
-    template<typename T>
-    struct NoSafeSmartPtr {
-        static void checkPoint() {}
-    };
+template<typename T>
+struct NoSafeSmartPtr {
+    static void checkPoint() {}
+};
 
 }
 

@@ -3,10 +3,10 @@
 
 namespace mem {
 
-    class Pointer {
-        virtual void *getPointer() = 0;
-        virtual void setPointer(void *ptr) = 0;
-    };
+class Pointer {
+    virtual void *getPointer() = 0;
+    virtual void setPointer(void *ptr) = 0;
+};
 }
 
 #endif //ALLOCATOR_POINTER_H

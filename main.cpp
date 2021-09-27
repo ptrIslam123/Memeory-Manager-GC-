@@ -1,42 +1,45 @@
 #include <iostream>
 #include "allocator/smart_ptr.h"
 #include "allocator/smart_ptr_type.h"
+#include "test/mem_buffer_test.h"
 
+template<class T>
+T* getData(mem::MemBlock *block) {
+    return (T*)((char*)block + sizeof (mem::MemBlock));
+}
 
-struct Foo {
-    Foo(int x, int y):
-        x_(x), y_(y) {
-        std::cout << "Foo(int x, int y)\n";
-    }
-    Foo(const Foo& other) {
-        std::cout << "Foo(const Foo& other)\n";
-        x_ = other.x_;
-        y_ = other.y_;
-    }
-    ~Foo() {
-        std::cout << "~Foo()\n";
-    }
-
-
-
-    int x_, y_;
-};
-
-Foo operator+ (const Foo &lFoo, const Foo &rFoo) {
-    return Foo((lFoo.x_ + rFoo.x_), (lFoo.y_ + rFoo.y_));
+template<class T>
+mem::MemBlock *getBlock(T ptr) {
+    return (mem::MemBlock*)(ptr - sizeof(mem::MemBlock));
 }
 
 int main() {
     using namespace mem;
+    typedef int Type;
+    typedef SmartPtr<Type, SafeSmartPtr<Type>, Allocator<Type>> PtrInt;
 
-    SmartPtr<Foo, SafeSmartPtr<Foo>> f1(Foo(10, 23));
-    SmartPtr<Foo, SafeSmartPtr<Foo>> f2(Foo(100, 230));
+    MemBuffer buffer(100);
+    buffer.allocateBuffer();
 
-    *f1 = *f1 + *f2;
-    std::cout << "-----------\n";
-    std::cout << f1->x_ << "\n";
-    std::cout << f1->y_ << "\n";
-    std::cout << "-----------\n";
+    MemBlock *m1 =  buffer.allocMemBlock(sizeof (int));
+    MemBlock *m2 = buffer.allocMemBlock(sizeof (int));
+
+    printBlock(m1);
+    printBlock(m2);
+
+    int *i1 = getData<int>(m1);
+    int *i2 = getData<int>(m2);
+
+    *i1 = 12;
+    *i2 = 23;
+
+    std::cout << *i1 << "\t" << *i2 << "\n";
+
+    MemBlock *cm1 = getBlock(i1);
+    MemBlock *cm2 = getBlock(i2);
+
+    printBlock(cm1);
+    printBlock(cm2);
 
     return 0;
 }

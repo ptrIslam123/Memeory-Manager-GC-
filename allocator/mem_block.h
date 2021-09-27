@@ -13,17 +13,15 @@ constexpr bool freeBlock = true;
 constexpr bool unfreeBlock = false;
 //! Объявление класса буфера
 
-class MemBuffer;
-
 class MemBlock {
 public:
-    explicit MemBlock(const size_t sizeBlock, MemBuffer *buffer, MemBlock *prevBlock, MemBlock *nextBlock);
+    explicit MemBlock(size_t sizeBlock, MemBuffer *buffer, MemBlock *prevBlock, MemBlock *nextBlock);
     ~MemBlock() = default;
 
-    void setSizeBlock(const size_t size);
-    void setStatusBlock(const bool status);
-    void setPrevMemBlock(MemBlock *const memBlock);
-    void setNextMemBlock(MemBlock *const memBlock);
+    void setSizeBlock(size_t size);
+    void setStatusBlock(bool status);
+    void setPrevMemBlock(MemBlock *memBlock);
+    void setNextMemBlock(MemBlock *memBlock);
 
     size_t getSizeBlock() const;
     bool getStatusBlock() const;

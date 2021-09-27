@@ -19,7 +19,7 @@ public:
     /*
      * @brief Инициализирует дефолтными значениями необходимые для работы класса переменные
      */
-    explicit MemBuffer(const size_t sizeBuff);
+    explicit MemBuffer(size_t sizeBuff);
     /*
      * @brief Уничтожает объекты раннее созданные для работы класса
      */
@@ -35,7 +35,7 @@ public:
      * @return MemBlock* указатель на новый блок памяти в случае успеха
      * @return nullptr в случае не удачи
      */
-    MemBlock* allocMemBlock(const size_t size);
+    MemBlock* allocMemBlock(size_t size);
 
     /*
      * @brief Деаллоцирует в буфере переданный блок памяти
@@ -54,7 +54,7 @@ public:
      * @return размер объединенного блока памяти в случае успеха
      * @return 0, если хотя бы один из блоков памяти оказался занятым
      */
-    size_t unitTwoFreeMemBlockInOneMemBlock(MemBlock *const lBlock, MemBlock *const rBlock);
+    size_t unitTwoFreeMemBlockInOneMemBlock(MemBlock *lBlock, MemBlock *rBlock);
 
     /*
      * @brief Объединяет два блока памяти не проверяя, свободны ли эти два блока
@@ -64,21 +64,21 @@ public:
      * @return размер объединенного блока памяти в случае успеха
      * @return 0, если хотя бы один из блоков памяти оказался занятым
      */
-    size_t unitTwoBlockInOne(MemBlock *const lBlock, MemBlock *const rBlock);
+    size_t unitTwoBlockInOne(MemBlock *lBlock, MemBlock *rBlock);
 
     /*
      * @brief Получить указатель на предыдущий блок памяти
      *
      * @return Указатель на предыдущий блок памяти
      */
-    MemBlock* getPrevMemBlock(MemBlock *const memBlock);
+    MemBlock* getPrevMemBlock(MemBlock *memBlock);
 
     /*
     * @brief Получить указатель на следующий блок памяти
     *
     * @return Указатель на следующий блок памяти
     */
-    MemBlock* getNextMemBlock(MemBlock *const memBlock);
+    MemBlock* getNextMemBlock(MemBlock *memBlock);
 
     /*
     * @brief Получить указатель на первый блок памяти
@@ -100,7 +100,7 @@ public:
      * @return true, если есть еще место для нового блока памяти
      * @return false, если память уже не хватает для размещения нового
      */
-    bool isBufferOver(const size_t size) const;
+    bool isBufferOver(size_t size) const;
 
     /*
      * @brief Возвращает указатель на буфер

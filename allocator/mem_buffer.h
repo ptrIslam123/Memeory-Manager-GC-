@@ -2,7 +2,7 @@
 #define UNTITLED1_MEM_BUFFER_H
 
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace mem {
 
@@ -15,7 +15,7 @@ class MemBlock;
  */
 class MemBuffer {
 public:
-
+    typedef MemBlock *(Func)(MemBlock *item, size_t size);
     /*
      * @brief Инициализирует дефолтными значениями необходимые для работы класса переменные
      */
@@ -120,6 +120,11 @@ public:
      */
     size_t getCountBlocks() const;
 
+    void *getBegin() const;
+    void *getEnd() const;
+
+    void forEachMemBlock();
+
 private:
     friend MemBlock;
     //! Указатель на начало буфера памяти
@@ -133,9 +138,6 @@ private:
     //! Количество созданных в буфере блоков памяти
     size_t countBlocks_;
 };
-
-
-MemBuffer& getMemBuffer();
 
 } //namespace mem
 

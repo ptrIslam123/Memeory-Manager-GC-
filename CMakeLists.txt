@@ -12,4 +12,6 @@ add_executable(allocator
         allocator/allocator.h
         allocator/smart_ptr.h
         allocator/pointer.h
-        allocator/smart_ptr_type.h)
+        allocator/smart_ptr_type.h
+        searching_strategy/searching_mem_block_strategy.h
+        memory_manager/memory_manager.h)

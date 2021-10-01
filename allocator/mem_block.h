@@ -1,9 +1,7 @@
 #ifndef ALLOCATOR_MEM_BLOCK_H
 #define ALLOCATOR_MEM_BLOCK_H
 
-#include <stdlib.h>
-#include "mem_buffer.h"
-
+#include <cstdlib>
 
 namespace mem {
 
@@ -16,6 +14,9 @@ constexpr bool unfreeBlock = false;
 //! Объявление типа класса блок памяти
 class MemBlock;
 
+//!
+class MemBuffer;
+
 /**
  * @brief Шаблонный метод для получения указателя на данные из объекта блок памяти
  * @tparam T Тип указателя на данные
@@ -27,12 +28,10 @@ T *getData(MemBlock **block);
 
 /**
  * @brief Шаблонная функция для получения указателя на объект типа блок памяти
- * @tparam T Тип указателя на указатель данных объекта
  * @param ptr Указатель на указатель объекта данных
  * @return Возвращает указатель на объект типа блок памяти
  */
-template<class T>
-MemBlock *getMemBlock(T **ptr);
+MemBlock *getMemBlock(void **ptr);
 
 /**
  * @brief Класс определяющий сущность блок(кусочек) памяти в буфере
@@ -42,80 +41,75 @@ MemBlock *getMemBlock(T **ptr);
  *      struct MemBlock
  *
  *      |-----------|
- *      | sizeBlock |
+ *      | sizeBlock | Размер блока памяти целиком без хедера с информацией о блоке
  *      |-----------|
- *      |statusBlock|
+ *      |statusBlock| Статус блока (свободный/занятый)
  *      |-----------|
- *      | *buffer   |
+ *      | *buffer   | Указатель на сам буфер
  *      |-----------|
- *      |*prevBlock |
+ *      |*prevBlock | Указатель на предыдущий блок памяти в буфере
  *      |-----------|
- *      |*nextBlock |
+ *      |*nextBlock | Указатель на следующий блок памяти в буфере
  *      |-----------|
- *      |   DATA    |
- *      |-----------|
- *      |           |
- *      |    .      |
- *      |    .      |
- *      |    .      |
+ *      |   DATA    | Сами данные
  *      |-----------|
  *
  */
 class MemBlock {
 public:
     /**
-     * @brief
-     * @param sizeBlock
-     * @param buffer
-     * @param prevBlock
-     * @param nextBlock
+     * @brief Класс реализующий сущность блока(кусочка) памяти в буфере
+     * @param sizeBlock Размер блока памяти
+     * @param buffer Указатель на буфер
+     * @param prevBlock Указатель на предыдущий блок памяти
+     * @param nextBlock Указатель на следующий блок памяти
      */
     explicit MemBlock(size_t sizeBlock, MemBuffer *buffer, MemBlock *prevBlock, MemBlock *nextBlock);
 
     /**
-     * @brief
+     * @brief Деструктор блока памяти
      */
     ~MemBlock() = default;
 
     /**
-     * @brief
-     * @param size
+     * @brief Устанавливает размер блока памяти
+     * @param size Размер блока
      */
     void setSizeBlock(size_t size);
 
     /**
-     * @brief
-     * @param status
+     * @brief Устанавливает статус блока
+     * @param status Статус блока
      */
     void setStatusBlock(bool status);
 
     /**
-     * @brief
-     * @param memBlock
+     * @brief Устанавливает указатель на предыдущий блок памяти
+     * @param memBlock Указатель на предыдущий блок памяти
      */
     void setPrevMemBlock(MemBlock *memBlock);
 
     /**
-     * @brief
-     * @param memBlock
+     * @brief Устанавливает указатель на следующий блок памяти
+     * @param memBlock Указатель на следующий блок памяти
      */
     void setNextMemBlock(MemBlock *memBlock);
 
     /**
-     * @brief
-     * @return
+     * @brief Возвращает размер блока памяти
+     * @return Размер блока памяти
      */
     size_t getSizeBlock() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Возвращает статус блока памяти
+     * @return Статус
      */
     bool getStatusBlock() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Возвращает указатель на предыдущий блок памяти
+     * @return Указатель на предыдущий блок памяти
      */
     MemBlock *getPrevMemBlock() const;
 
@@ -151,14 +145,6 @@ template<class T>
 T *getData(MemBlock **block) {
     return (T*)((char*)(*block) + sizeof (MemBlock));
 }
-
-
-template<class T>
-MemBlock *getMemBlock(T **ptr) {
-    return (MemBlock*)((char*)(*ptr) - sizeof (MemBlock));
-}
-
-MemBuffer &getMemBufferInstance();
 
 } // namespace mem
 

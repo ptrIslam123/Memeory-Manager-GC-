@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "pointer.h"
-#include "mem_block.h"
+#include "../memory_manager/memory_manager.h"
 
 namespace mem {
 
@@ -65,27 +65,24 @@ public:
     void destruct(T *data);
 
 private:
-    T *getData(MemBlock *memBlock);
-    MemBlock* getMemBlock(T *data);
-
     MemBlock *memBlock_; //!< указатель на блок памяти, выделенный с помощью менеджера памяти
-    MemBuffer *const memBufferInstance_; //!< Константный указатель на экземпляр менеджера памяти
+    MemoryManager<sizeMemoryManager> *const memoryManager_; //!< Константный указатель на экземпляр менеджера памяти
 };
 
 template<typename T>
 Allocator<T>::Allocator():
-    memBlock_(nullptr), memBufferInstance_(&getMemBufferInstance()) {
+    memBlock_(nullptr), memoryManager_(&getMemoryManagerInstance()) {
 }
 
 template<typename T>
 T *Allocator<T>::allocate(size_t size, Pointer *) {
-    memBlock_ = memBufferInstance_->allocMemBlock(size);
-    return getData(memBlock_);
+    memBlock_ = memoryManager_->allocateMemory(size);
+    return getData<T>(&memBlock_);
 }
 
 template<typename T>
 void Allocator<T>::deallocate(T *data, Pointer *) {
-    memBufferInstance_->deallocateMemBlock(getMemBlock(data));
+    memoryManager_->deallocateMemory((void**)(&data));
 }
 
 template<typename T>
@@ -97,17 +94,6 @@ void Allocator<T>::construct(T *data, Args &&... args) {
 template<typename T>
 void Allocator<T>::destruct(T *data) {
     data->~T();
-}
-
-
-template<typename T>
-T *Allocator<T>::getData(MemBlock *memBlock) {
-    return (T*)((char*)memBlock + memBlock->getSizeBlock());
-}
-
-template<typename T>
-MemBlock *Allocator<T>::getMemBlock(T *data) {
-    return (MemBlock*)((char*)data - memBlock_->getSizeBlock());
 }
 
 }

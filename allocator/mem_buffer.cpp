@@ -8,8 +8,8 @@ MemBuffer::MemBuffer(const size_t sizeBuff):
         begin_(nullptr),
         curFreeSpace_(nullptr),
         sizeBuff_(sizeBuff),
-        countBlocks_(0)
-{}
+        countBlocks_(0) {
+}
 
 void MemBuffer::allocateBuffer() {
     begin_ = malloc(sizeBuff_);
@@ -23,7 +23,7 @@ MemBlock* MemBuffer::allocMemBlock(const size_t size) {
         return nullptr;
     }
 
-    MemBlock* newMemBlock = nullptr;
+    MemBlock *newMemBlock = nullptr;
 
     if (curFreeSpace_ == begin_) {
         newMemBlock = static_cast<MemBlock*>(begin_);
@@ -31,10 +31,14 @@ MemBlock* MemBuffer::allocMemBlock(const size_t size) {
         new (newMemBlock) MemBlock(size, this, nullptr, static_cast<MemBlock*>(curFreeSpace_));
         lastMemBlock_ = newMemBlock;
     }else {
-        newMemBlock = static_cast<MemBlock*>(curFreeSpace_);
-        curFreeSpace_ = (char*)curFreeSpace_ + totalSize;
-        new (newMemBlock) MemBlock(size, this, lastMemBlock_, static_cast<MemBlock*>(curFreeSpace_));
-        lastMemBlock_ = newMemBlock;
+        if (!(curFreeSpace_ >= getEnd())) {
+            newMemBlock = static_cast<MemBlock*>(curFreeSpace_);
+            curFreeSpace_ = (char*)curFreeSpace_ + totalSize;
+            new (newMemBlock) MemBlock(size, this, lastMemBlock_, static_cast<MemBlock*>(curFreeSpace_));
+            lastMemBlock_ = newMemBlock;
+        } else {
+//            newMemBlock = findMemBlock(memBlockSearchingStrategy_, size);
+        }
     }
 
     sizeBuff_ -= totalSize;
@@ -119,17 +123,12 @@ MemBlock* MemBuffer::getLastMemBlock() {
     return lastMemBlock_;
 }
 
+void *MemBuffer::getBegin() const {
+    return begin_;
+}
 
-MemBuffer &getMemBufferInstance() {
-    static constexpr size_t sizeBuffer = 1024;
-    static mem::MemBuffer buffer(sizeBuffer);
-    static bool isInitBuffer = false;
-
-    if (!isInitBuffer) {
-        buffer.allocateBuffer();
-        isInitBuffer = true;
-    }
-    return buffer;
+void *MemBuffer::getEnd() const {
+    return static_cast<char*>(begin_) + sizeBuff_;
 }
 
 } //namespace mem

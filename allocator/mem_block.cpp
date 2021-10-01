@@ -52,4 +52,8 @@ bool MemBlock::isFirstMemBlock() const {
     return (char*)this == (char*)(buffer_->begin_);
 }
 
+MemBlock *getMemBlock(void **ptr) {
+    return (MemBlock*)((char*)(*ptr) - sizeof (MemBlock));
+}
+
 } //namespace mem
